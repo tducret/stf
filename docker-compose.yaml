@@ -3,7 +3,7 @@ version: "3"
 services:
   rethinkdb:
     container_name: rethinkdb
-    image: rethinkdb:2.3
+    image: rethinkdb:2.4.2-bullseye-slim
     restart: unless-stopped
     volumes:
         - "rethinkdb-data:/data"
@@ -11,7 +11,7 @@ services:
 
   adb:
     container_name: adb
-    image: devicefarmer/adb:latest
+    image: gounthar/docker-adb:aarch64
     restart: unless-stopped
     volumes: 
       - "/dev/bus/usb:/dev/bus/usb"
@@ -19,7 +19,9 @@ services:
 
   stf:
     container_name: stf
-    image: devicefarmer/stf
+    build:
+      context: .
+      dockerfile: Dockerfile-debian-arm64
     ports:
       - "7100:7100"
       - "7110:7110"
@@ -27,10 +29,10 @@ services:
     environment:
       - TZ='America/Los_Angeles'
       - RETHINKDB_PORT_28015_TCP=tcp://rethinkdb:28015
-      - STF_ADMIN_EMAIL=<YOUR_EMAIL>
-      - STF_ADMIN_NAME=<YOUR_NAME>
+      - STF_PROVIDER_SCREEN_FRAME_RATE=10
+      - STF_PROVIDER_SCREEN_JPEG_QUALITY=40
     restart: unless-stopped
-    command: stf local --adb-host adb --public-ip YOUR_IP --provider-min-port 7400 --provider-max-port 7500
+    command: stf local --adb-host adb --public-ip [YOUR_LOCAL_IP] --provider-min-port 7400 --provider-max-port 7500
 
 volumes:
   rethinkdb-data: {}
